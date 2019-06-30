@@ -5,4 +5,4 @@ JJACK! Server
 <br>
 
 ### API
-https://docs.google.com/spreadsheets/d/1bGr8w2zIMYZ6OaeLYCAG36V4toqeROjNtg71x5tWPzM/edit#gid=0
+https://docs.google.com/spreadsheets/d/1bGr8w2zIMYZ6OaeLYCAG36V4toqeROjNtg71x5tWPzM/edit?usp=sharing
