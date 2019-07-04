@@ -7,6 +7,11 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+//mongodb 불러오기
+var mongoose = require('./config/mongoose');
+//db 사용
+mongoose();
+
 var app = express();
 
 // view engine setup
