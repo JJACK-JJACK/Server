@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
             date: -1
         })
         .then((allPrograms) => {
-            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_FAIL, allPrograms));
+            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, allPrograms));
         }).catch((err) => {
             res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
         });
