@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+var moment = require('moment');
+require('moment-timezone');
+
+moment.tz.setDefault("Asia/Seoul");
 
 const programSchema = new mongoose.Schema({
     title: { type: String, required: true},
@@ -25,6 +29,10 @@ programSchema.pre('save', function(next) {
         next(new Error("totalBerry can not be bigger than maxBerry"));
     }
     next();
+});
+
+programSchema.virtual('dday').get(function() {
+    return Math.floor((this.finish-moment().format('YYYY-MM-DD HH:mm:ss')) / (1000 * 60 * 60 * 24));
 });
 
 module.exports = mongoose.model('Program', programSchema);
