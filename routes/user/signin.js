@@ -29,11 +29,8 @@ router.post('/', async (req, res) => {
                 const tokens = {
                     token: jwtUtils.sign(selectResult[0]).token
                 }
-                const tokenUpdateQuery = "UPDATE User SET token = ? WHERE email= ?";
-                const tokenUpdateResult = await pool.queryParam_Parse(tokenUpdateQuery, [jwtUtils.sign(selectResult[0]).token, req.body.email]);
                 
-                if (tokenUpdateResult)
-                    res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, tokens));
+                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, tokens));
             } else {
                 res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
             }

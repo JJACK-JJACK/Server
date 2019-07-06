@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
         const hashedPw = await crypto.pbkdf2(password.toString(), salt, 1000, 32, 'SHA512');
 
         const insertSignupQuery =
-            'INSERT INTO User (email, nickname, password, salt, token, myBerry, totalBerry, totalDonate) VALUES (?, ?, ?, ?, 0, 0, 0, 0)';
+            'INSERT INTO User (email, nickname, password, salt, myBerry, totalBerry) VALUES (?, ?, ?, ?, 0, 0)';
         const insertSignupResult = await pool.queryParam_Parse(insertSignupQuery, [email, nickname, hashedPw.toString('base64'), salt]);
 
         if (!insertSignupResult) {

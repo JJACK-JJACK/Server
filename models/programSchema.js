@@ -31,8 +31,4 @@ programSchema.pre('save', function(next) {
     next();
 });
 
-programSchema.virtual('dday').get(function() {
-    return Math.floor((this.finish-moment().format('YYYY-MM-DD HH:mm:ss')) / (1000 * 60 * 60 * 24));
-});
-
 module.exports = mongoose.model('Program', programSchema);
