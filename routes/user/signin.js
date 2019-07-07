@@ -15,6 +15,15 @@ const jwt = require('jsonwebtoken');
 const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 됨, 깃헙 공유 드라이브 올리지 말기
 
 
+const jwt = require('jsonwebtoken');
+
+const secretKey = "jwtSecretKey!";
+const options = {
+    algorithm: "HS256",
+    expiresIn: "14d",
+    issuer: "minjony"
+};
+
 router.post('/', async (req, res) => {
     const selectIdQuery = 'SELECT * FROM User WHERE email = ?';
     const selectResult = await pool.queryParam_Parse(selectIdQuery, [req.body.email]);
@@ -30,15 +39,17 @@ router.post('/', async (req, res) => {
             const hashedPw = await crypto.pbkdf2(pwd.toString(), selectResult[0].salt, 1000, 32, 'SHA512');
 
             if (selectResult[0].password == hashedPw.toString('base64')) {
-                
-                const payload = { //어떤 데이터를 넣으지는 플젝에 맞게 하면 됨, 여기에 많은 데이터를 넣었을때 이걸 해팅당하면 망
-                    userIdx: userIdx,
-                    email: req.body.email
-                };
-            
-                const jwtToken = jwt.sign(payload, secretOrPrivateKey);
 
-                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, jwtToken));
+
+                const payload = {
+                    userIdx: selectResult[0].userIdx,
+                    email: selectResult[0].email,
+                    nickname: selectResult[0].nickname
+                };
+                
+                const token = jwt.sign(payload, secretKey, options);
+
+                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, token));
             } else {
                 res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
             }

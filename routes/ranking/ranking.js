@@ -4,8 +4,9 @@ var router = express.Router();
 const resMessage = require('../../module/utils/responseMessage');
 const statusCode = require('../../module/utils/statusCode');
 const utils = require('../../module/utils/utils');
-const pool = require('../../config/dbConfig');
+
 const Program = require('../../models/programSchema');
+const UserHistory = require('../../models/userHistorySchema');
 
 router.get('/', async (req, res) => {
     Program.find({
@@ -21,16 +22,18 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:categoryId', async (req, res) => {
-    Program.find({
-            categoryId: req.params.categoryId
-        })
-        .then((program) => {
-            let program_id = Object.values(program);
-            console.log(program_id);
-
-        }).catch((err) => {
-            console.log(err);
-            res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+    UserHistory.find()
+        .populate({
+            path: 'Program',
+            select: 'categoryId',
+            match: {
+                categoryId: req.params.categoryId,
+            },
+        }).exec(function (err, history) {
+            if (err) {
+                res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+            }
+            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, history));
         });
 });
 
