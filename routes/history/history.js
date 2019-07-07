@@ -17,31 +17,49 @@ const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 �
 router.get('/', async (req, res) => {
 
     const user = jwt.verify(req.headers.token, secretOrPrivateKey);
+    console.log("userData:::" + JSON.stringify(user));
 
     const programIdxQuery = 'SELECT programIdx FROM UserHistory WHERE userIdx = ?';
-    const programIdxResult = await pool.queryParam_Parse(programIdxQuery, user.idx);
-
+    var programIdxResult = await pool.queryParam_Parse(programIdxQuery, user.userIdx);
     if (programIdxResult[0] == null) {
         res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.NO_DATA));
     } else {
-        
+        console.log(JSON.stringify(user.userIdx));
+
+        const donateQuery = 'SELECT COUNT(*) donateCnt, SUM(donateBerry) donateSum FROM UserHistory WHERE userIdx = ?';
+        const donate = await pool.queryParam_Parse(donateQuery, user.userIdx);
+
+        var resData = {
+            "donateCnt": donate[0].donateCnt,
+            "donateSum": donate[0].donateSum
+        }
+
+        var i;
+        console.log("length:::"+programIdxResult.length);
         Program.find({
-            _id: programIdxResult[0].programIdx
+            _id: {$in: programIdxResult}
         })
-            .then((program) => {
-                console.log(program[0].review.plan);
-                const resData = {
-                    program,
-                }
-                res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS,program));
-            }).catch((err) => {
-                console.log(err);
-                res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
-            });
+        for (i=0; i < programIdxResult.length; i++) {
+            Program.find({
+                _id: programIdxResult[i].programIdx
+            })
+                .then((program) => {
+                    console.log(`2:::iii ${i}`);
 
-        //res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, resData));
+                    resData.program = program;
+                    if(i == programIdxResult.length){
+                        res.status(200).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS));
 
-        //res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
+                        res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, resData));
+                    }
+
+                    //console.log(program._id+":::"+JSON.stringify(resData));
+                }).catch((err) => {
+                    console.log(err);
+                    res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+                });
+        }
+
     }
 });
 
