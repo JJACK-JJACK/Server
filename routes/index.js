@@ -8,5 +8,6 @@ router.use('/category', require('./category/index'));
 router.use('/image', require('./image/index'));
 router.use('/program', require('./program/index'));
 router.use('/ranking', require('./ranking/index'));
+router.use('/userHistory', require('./userHistory/index'));
 
 module.exports = router;

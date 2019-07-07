@@ -11,6 +11,15 @@ const jwtUtils = require('../../module/jwt');
 const crypto = require('crypto-promise');
 const pool = require('../../module/pool');
 
+const jwt = require('jsonwebtoken');
+
+const secretKey = "jwtSecretKey!";
+const options = {
+    algorithm: "HS256",
+    expiresIn: "14d",
+    issuer: "minjony"
+};
+
 router.post('/', async (req, res) => {
     const selectIdQuery = 'SELECT * FROM User WHERE email = ?';
     const selectResult = await pool.queryParam_Parse(selectIdQuery, [req.body.email]);
@@ -26,11 +35,16 @@ router.post('/', async (req, res) => {
             const hashedPw = await crypto.pbkdf2(pwd.toString(), selectResult[0].salt, 1000, 32, 'SHA512');
 
             if (selectResult[0].password == hashedPw.toString('base64')) {
-                const tokens = {
-                    token: jwtUtils.sign(selectResult[0]).token
-                }
+
+                const payload = {
+                    userIdx: selectResult[0].userIdx,
+                    email: selectResult[0].email,
+                    nickname: selectResult[0].nickname
+                };
                 
-                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, tokens));
+                const token = jwt.sign(payload, secretKey, options);
+
+                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, token));
             } else {
                 res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
             }
