@@ -8,11 +8,7 @@ router.use('/image', require('./image/index'));
 router.use('/program', require('./program/index'));
 router.use('/ranking', require('./ranking/index'));
 router.use('/userHistory', require('./userHistory/index'));
-<<<<<<< HEAD
 router.use('/berryHistory', require('./berryHistory/index'));
-=======
 router.use('/donate', require('./donate/index'));
-
->>>>>>> 681be30323eec453770cd5d41fcb917552a6f836
 
 module.exports = router;
