@@ -32,8 +32,8 @@ router.post('/:programId', (req, res) => {
                     $push: {
                         program: {
                             "program_id": program[0]._id,
-                            "donateDate": moment().format('YYYY-MM-DD HH:mm:ss'),
-                            "donateBerry": req.body.berry
+                            "date": moment().format('YYYY-MM-DD HH:mm:ss'),
+                            "donateBerry": parseInt(req.body.berry)
                         }
                     }
                 }, {
