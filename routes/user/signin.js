@@ -10,8 +10,9 @@ const jwtUtils = require('../../module/jwt');
 
 const crypto = require('crypto-promise');
 const pool = require('../../module/pool');
-
 const jwt = require('jsonwebtoken');
+
+const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 됨, 깃헙 공유 드라이브 올리지 말기
 
 const secretKey = "jwtSecretKey!";
 const options = {
@@ -24,7 +25,7 @@ router.post('/', async (req, res) => {
     const selectIdQuery = 'SELECT * FROM User WHERE email = ?';
     const selectResult = await pool.queryParam_Parse(selectIdQuery, [req.body.email]);
     const pwd = req.body.password;
-
+    const userIdx = selectResult[0].userIdx;
 
     if (req.body.id === null || !req.body.password) {
         res.status(statusCode.OK).send(util.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
@@ -35,6 +36,7 @@ router.post('/', async (req, res) => {
             const hashedPw = await crypto.pbkdf2(pwd.toString(), selectResult[0].salt, 1000, 32, 'SHA512');
 
             if (selectResult[0].password == hashedPw.toString('base64')) {
+
 
                 const payload = {
                     userIdx: selectResult[0].userIdx,
