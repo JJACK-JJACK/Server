@@ -19,8 +19,6 @@ router.post('/:programId', (req, res) => {
 
     const user = jwt.verify(req.headers.token, secretKey);
 
-    console.log(user);
-
     Program.find({
             _id: req.params.programId
         })
@@ -32,8 +30,8 @@ router.post('/:programId', (req, res) => {
                     $push: {
                         program: {
                             "program_id": program[0]._id,
-                            "donateDate": moment().format('YYYY-MM-DD HH:mm:ss'),
-                            "donateBerry": req.body.berry
+                            "date": moment().format('YYYY-MM-DD HH:mm:ss'),
+                            "donateBerry": parseInt(req.body.berry)
                         }
                     }
                 }, {
@@ -46,7 +44,41 @@ router.post('/:programId', (req, res) => {
                 }).catch((err) => {
                     console.log(err);
                 });
+        }).catch((err) => {
+            console.log(err);
+            res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+        });
+});
 
+router.get('/', (req, res) => {
+
+    const user = jwt.verify(req.headers.token, secretKey);
+
+    UserHistory.aggregate([{
+                $lookup: {
+                    localField: "user_id",
+                    from: "berryhistories", //the collection name, (bad)before i had Phrase as the model
+                    foreignField: "user_id",
+                    as: "charge"
+                }
+            },
+            {
+                $unwind: "$charge"
+            },
+            {
+                $project: {
+                    user_id: 1,
+                    history: {
+                        $concatArrays: ["$program", "$charge.charge"]
+                    },
+                }
+            },
+            {
+                $sort:{ "history.date" : -1 }
+            }
+        ])
+        .then((result) => {
+            res.status(statusCode.OK).send(utils.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
         }).catch((err) => {
             console.log(err);
             res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
