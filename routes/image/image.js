@@ -3,7 +3,7 @@ var router = express.Router();
 
 const resMessage = require('../../module/utils/responseMessage');
 const statusCode = require('../../module/utils/statusCode');
-const util = require('../../module/utils/utils');
+const utils = require('../../module/utils/utils');
 const upload = require('../../config/multer');
 
 router.post('/', upload.single('image'), (req, res) => {

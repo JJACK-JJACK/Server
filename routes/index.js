@@ -12,7 +12,4 @@ router.use('/berryHistory', require('./berryHistory/index'));
 router.use('/donate', require('./donate/index'));
 router.use('/stamp', require('./stamp/index'));
 router.use('/history', require('./history/index'));
-
-
-
 module.exports = router;
