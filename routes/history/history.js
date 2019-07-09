@@ -32,17 +32,13 @@ router.get('/', async (req, res) => {
         var programHistory = [];
 
         for(var i =0; i<programs.length; i++){
-
             Program.find({
-                _id: programs[i] 
+                _id: programs[i]
             }).then((result) => {
-                var donateJson = new Object();
-                donateJson.program = result;
-                console.log(donateJson);
-                programHistory.push(donateJson);
+                programHistory.push(result[0]);
                 console.log(programHistory);
                 if(programHistory.length == programs.length)
-                    res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
+                    res.status(200).send(util.successHistory(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
             }).catch((err) => {
                 console.log(err);
             });
