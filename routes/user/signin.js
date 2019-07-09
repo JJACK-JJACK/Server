@@ -15,6 +15,7 @@ const jwt = require('jsonwebtoken');
 const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 됨, 깃헙 공유 드라이브 올리지 말기
 
 const secretKey = "jwtSecretKey!";
+
 const options = {
     algorithm: "HS256",
     expiresIn: "14d",

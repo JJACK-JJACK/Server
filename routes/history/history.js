@@ -22,20 +22,33 @@ router.get('/', async (req, res) => {
     UserHistory.find(
         { user_id: user.userIdx },
     ).then((history) => {
-        var donateBerry = {};
-        history[0]["program"].forEach(function (item) {
-            donateBerry.donateBerry = (item.donateBerry);
-        });
-        Program.find({
-            _id: { $in: programs }
-        }).then((result) => {
-            console.log(`result arr ${result}`);
-            result.donateBerry = donateBerry;
+        var programs = [];
 
-            res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, result));
-        }).catch((err) => {
-            console.log(err);
+        history[0]["program"].forEach(function (item) {
+            programs.push((item.program_id));
         });
+        console.log(programs);
+
+        var programHistory = [];
+
+        for(var i =0; i<programs.length; i++){
+
+            Program.find({
+                _id: programs[i] 
+            }).then((result) => {
+                var donateJson = new Object();
+                donateJson.program = result;
+                console.log(donateJson);
+                programHistory.push(donateJson);
+                console.log(programHistory);
+                if(programHistory.length == programs.length)
+                    res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
+    
+
     }).catch((err) => {
         console.log(err);
         res.status(200).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
@@ -63,15 +76,12 @@ router.get('/berry', async (req, res) => {
     ).then((history) => {
         var donateBerry = [];
         
-        var donateArray = new Array();
-
         history[0]["program"].forEach(function (item) {
             var donateJson = new Object();
             donateJson.berry = (item.donateBerry);
             donateJson.id = (item.program_id);
             console.log(donateJson);
             donateBerry.push(donateJson);
-            //donateArray.add(donateJson);
             console.log(donateBerry);
         });
 
