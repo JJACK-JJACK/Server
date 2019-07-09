@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
         res.status(statusCode.OK).send(util.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
     } else {
         if (nickNameResult[0] == null) {
-            res.status(200).send(util.successFalse(statusCode.OK, resMessage.AVAILABLE_NICKNAME));
+            res.status(200).send(util.successTrue(statusCode.OK, resMessage.AVAILABLE_NICKNAME));
         } else {
             res.status(200).send(util.successFalse(statusCode.BAD_REQUEST, resMessage.DUPLICATION_NICKNAME));
         }
