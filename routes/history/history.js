@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
                 var donateJson = new Object();
                 donateJson.program = result;
                 console.log(donateJson);
-                programHistory.push(result);
+                programHistory.push(donateJson);
                 console.log(programHistory);
                 if(programHistory.length == programs.length)
                     res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
