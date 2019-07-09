@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
                 
                 const token = jwt.sign(payload, secretKey, options);
 
-                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, token));
+                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, {"token": token}));
             } else {
                 res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
             }
