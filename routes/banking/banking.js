@@ -5,6 +5,7 @@ const resMessage = require('../../module/utils/responseMessage');
 const statusCode = require('../../module/utils/statusCode');
 const util = require('../../module/utils/utils');
 
+const async = require('async');
 const BerryHistory = require('../../models/berryHistorySchema');
 const UserHistory = require('../../models/userHistorySchema');
 const Program = require('../../models/programSchema');
@@ -15,6 +16,10 @@ const secretKey = "jwtSecretKey!";
 var moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault("Asia/Seoul");
+
+function custom_sort(a, b) {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+}
 
 router.get('/', (req, res) => {
 
@@ -36,47 +41,31 @@ router.get('/', (req, res) => {
             UserHistory.find({
                     user_id: user.userIdx
                 })
-                .then((history) => {
+                .then(async (history) => {
+                    var programs = [];
+                    history[0]["program"].forEach(function (item) {
+                        Program.find({
+                                _id: item.program_id
+                            })
+                            .then((program) => {
+                                var centerName = program[0].centerName;
+                                delete item.program_id;
+                                item.donateBerry = "+".concat(item.donateBerry);
+                                item.centerName = centerName;
+                                item.berry = item.donateBerry;
+                                delete item.donateBerry;
+                                bank.push(item);
+                                programs.push(item);
 
-                    function getHistory() {
-                        history[0]["program"].forEach(function (item) {
-                            Program.find({
-                                    _id: item.program_id
-                                })
-                                .then((program) => {
-                                    var centerName = program[0].centerName;
-                                    delete item.program_id;
-                                    item.donateBerry = "+".concat(item.donateBerry);
-                                    item.name = centerName;
-                                    item.berry = item.donateBerry;
-                                    delete item.donateBerry;
-                                    bank.push(item);
-                                }).catch((err) => {
-                                    console.log(err);
-                                    res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
-                                });
-                        });
-                    }
+                                if (programs.length == history[0]["program"].length) {
+                                    bank.sort(custom_sort);
+                                    res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, {"user_id": user.userIdx,"history": bank }));
+                                }
 
-                    function custom_sort(a, b) {
-                        return new Date(b.date).getTime() - new Date(a.date).getTime();
-                    }
-
-                    function response() {
-                        bank.sort(custom_sort);
-                        res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, bank));
-                    }
-
-                    function create() {
-                        return new Promise(function (resolve, reject) {
-                            getHistory();
-                            resolve();
-                        });
-                    };
-                    create().then(function () {
-                        response();
-                    }, function (err) {
-                        console.log(err);
+                            }).catch((err) => {
+                                console.log(err);
+                                res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+                            });
                     });
                 }).catch((err) => {
                     console.log(err);

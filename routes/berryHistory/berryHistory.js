@@ -5,7 +5,7 @@ const resMessage = require('../../module/utils/responseMessage');
 const statusCode = require('../../module/utils/statusCode');
 const util = require('../../module/utils/utils');
 
-const BerryHistory = require('../../models/berryHistory');
+const BerryHistory = require('../../models/berryHistorySchema');
 
 const jwt = require('jsonwebtoken');
 const secretKey = "jwtSecretKey!";
