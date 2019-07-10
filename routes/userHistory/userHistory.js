@@ -51,12 +51,12 @@ router.post('/:programId', async (req, res) => {
                             console.log("sssstamp" + stamp.cntStamp);
                             
                             //사용자 보유베리에서 기부값 마이너스 하기
-                            const myBerry = await pool.queryParam_Parse(selectBerry, [selectBerry[0]-req.body.donateBerry,user.userIdx]);
-                            const update = await pool.queryParam_Parse(updateBerry,[myBerry, user.userIdx] );   
+                            // const myBerry = await pool.queryParam_Parse(selectBerry, [selectBerry[0]-req.body.donateBerry,user.userIdx]);
+                            // const update = await pool.queryParam_Parse(updateBerry,[myBerry, user.userIdx] );   
 
                             if (stamp[0].cntStamp === 9) {
                                 var random = Math.floor(Math.random() * 10) + 1;
-                                var reward = (stamp[0].totalBerry + parseInt(req.body.donateBerry)) * (random / 100);
+                                var reward = Math.floor((stamp[0].totalBerry + parseInt(req.body.donateBerry)) * (random / 100));
                                 console.log(random + "+++" + reward);
 
                                 //사용자 보류 베리에 리워드 저장하기
