@@ -38,7 +38,6 @@ router.post('/', async (req, res) => {
 
             if (selectResult[0].password == hashedPw.toString('base64')) {
 
-
                 const payload = {
                     userIdx: selectResult[0].userIdx,
                     email: selectResult[0].email,
