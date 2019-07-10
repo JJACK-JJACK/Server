@@ -24,6 +24,7 @@ router.post('/', (req, res) => {
         BerryHistory.findOneAndUpdate({
                 user_id: user.userIdx
             }, {
+
                 $push: {
                     charge: {
                         "title" : "충전",
