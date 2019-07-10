@@ -26,6 +26,7 @@ router.post('/', (req, res) => {
             }, {
                 $push: {
                     charge: {
+                        "title" : "충전",
                         "chargeBerry": parseInt(req.body.chargeBerry),
                         "date": moment().format('YYYY-MM-DD HH:mm:ss'),
                     }
