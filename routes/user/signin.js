@@ -4,9 +4,6 @@ var router = express.Router();
 const util = require('../../module/utils/utils');
 const statusCode = require('../../module/utils/statusCode');
 const resMessage = require('../../module/utils/responseMessage');
-const authUtil = require('../../module/utils/authUtils');
-
-const jwtUtils = require('../../module/jwt');
 
 const crypto = require('crypto-promise');
 const pool = require('../../module/pool');
@@ -46,7 +43,7 @@ router.post('/', async (req, res) => {
                 
                 const token = jwt.sign(payload, secretKey, options);
 
-                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, {"token": token}));
+                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, {"token": token, "nickname": payload.nickname}));
             } else {
                 res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
             }

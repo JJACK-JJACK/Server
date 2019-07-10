@@ -7,6 +7,8 @@ const util = require('../../module/utils/utils');
 
 const BerryHistory = require('../../models/berryHistorySchema');
 
+const pool = require('../../module/pool');
+
 const jwt = require('jsonwebtoken');
 const secretKey = "jwtSecretKey!";
 
@@ -27,7 +29,7 @@ router.post('/', (req, res) => {
 
                 $push: {
                     charge: {
-                        "title" : "충전",
+                        "title": "충전",
                         "chargeBerry": parseInt(req.body.chargeBerry),
                         "date": moment().format('YYYY-MM-DD HH:mm:ss'),
                     }
@@ -37,11 +39,29 @@ router.post('/', (req, res) => {
                 new: true,
                 runValidators: true
             })
-            .then((result) => {
+            .then(async (result) => {
+
+                const UpdateBerryQuery = 'UPDATE User SET myBerry = myBerry + ? WHERE userIdx = ?';
+                await pool.queryParam_Parse(UpdateBerryQuery, [req.body.chargeBerry, user.userIdx]);
+
                 res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, result));
             }).catch((err) => {
                 res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
             });
+    }
+});
+
+router.get('/myBerry', async (req, res) => {
+
+    const user = jwt.verify(req.headers.token, secretKey);
+
+    const SelectBerryQuery = 'SELECT myBerry FROM User WHERE userIdx = ?';
+    const SelectResult = await pool.queryParam_Parse(SelectBerryQuery, [user.userIdx]);
+
+    if (SelectResult[0] == null) {
+        res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+    } else {
+        res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, SelectResult[0].myBerry));
     }
 });
 

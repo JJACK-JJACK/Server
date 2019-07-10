@@ -8,7 +8,7 @@ const utils = require('../../module/utils/utils');
 const Program = require('../../models/programSchema');
 const UserHistory = require('../../models/userHistorySchema');
 
-router.get('/', async (req, res) => {
+router.get('/',async (req, res) => {
     Program.find({
             state: 2
         }).sort({
