@@ -65,32 +65,20 @@ router.post('/:programId', (req, res) => {
                             })
                             .then(async (result) => {
                                 stamps = result.cntStamp;
-                                if(result.cntStamp >= 10){
+                                if (result.cntStamp >= 10) {
                                     var random = Math.floor(Math.random() * 10) + 1;
                                     var reward = Math.floor((result.totalBerry) * (random / 100));
-    
-                                    BerryHistory.findOneAndUpdate({
-                                        user_id: user.userIdx
-                                    }, {
-                                        $push: {
-                                            charge: {
-                                                "title": "베리 수확",
-                                                "chargeBerry": reward,
-                                                "date": moment().format('YYYY-MM-DD HH:mm:ss'),
-                                            }
-                                        }
-                                    }, {
-                                        upsert: true,
-                                        new: true,
-                                        runValidators: true
-                                    })
-                                    .then(async (result) => {
-                                        rewardBerry = reward;
 
-                                        Stamp.findOneAndUpdate({
+                                    BerryHistory.findOneAndUpdate({
                                             user_id: user.userIdx
                                         }, {
-                                        totalBerry : 0, cntStamp : 0
+                                            $push: {
+                                                charge: {
+                                                    "title": "베리 수확",
+                                                    "chargeBerry": reward,
+                                                    "date": moment().format('YYYY-MM-DD HH:mm:ss'),
+                                                }
+                                            }
                                         }, {
                                             upsert: true,
                                             new: true,
@@ -98,15 +86,28 @@ router.post('/:programId', (req, res) => {
                                         })
                                         .then(async (result) => {
                                             rewardBerry = reward;
-    
-                                            
+
+                                            Stamp.findOneAndUpdate({
+                                                    user_id: user.userIdx
+                                                }, {
+                                                    totalBerry: 0,
+                                                    cntStamp: 0
+                                                }, {
+                                                    upsert: true,
+                                                    new: true,
+                                                    runValidators: true
+                                                })
+                                                .then(async (result) => {
+                                                    rewardBerry = reward;
+
+
+                                                }).catch((err) => {
+                                                    res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
+                                                });
+
                                         }).catch((err) => {
                                             res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
                                         });
-
-                                    }).catch((err) => {
-                                        res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.SAVE_FAIL));
-                                    });
                                 }
 
                                 const UpdateBerryQuery = 'UPDATE User SET myBerry = myBerry - ? WHERE userIdx = ?';
@@ -122,12 +123,28 @@ router.post('/:programId', (req, res) => {
                                     new: true,
                                     upsert: true,
                                     runValidators: true
-                                }) .then(async (result) => {
-                                    res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, {"totalBerry" : result.totalBerry, "stamps": stamps, "rewordsBerry" : rewardBerry }));
+                                }).then(async (result) => {
+                                    Program.findOneAndUpdate({
+                                        _id: req.params.programId
+                                    }, {
+                                        percentage: parseInt((result.totalBerry / result.maxBerry)* 100),
+                                    }, {
+                                        new: true,
+                                        upsert: true,
+                                        runValidators: true
+                                    }).then(async (result) => {
+
+                                        res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.SAVE_SUCCESS, {
+                                            "totalBerry": result.totalBerry,
+                                            "stamps": stamps,
+                                            "rewordsBerry": rewardBerry
+                                        }));
+                                    });
+
+                                }).catch((err) => {
                                     console.log(err);
                                     res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
                                 });
-
                             }).catch((err) => {
                                 console.log(err);
                                 res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));

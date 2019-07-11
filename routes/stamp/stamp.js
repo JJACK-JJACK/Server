@@ -18,7 +18,11 @@ router.get('/', async (req, res) => {
     StampSchema.find(
         { user_id: user.userIdx }
     ).then((stamp) => {
-        res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, {cntStamp:stamp[0].cntStamp}));
+        if(stamp[0] == null){
+            res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, {cntStamp:0}));
+        }else{
+            res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, {cntStamp:stamp[0].cntStamp}));
+        }
     }).catch((err) => {
         console.log(err);
         res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));

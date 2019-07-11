@@ -19,31 +19,36 @@ router.get('/', async (req, res) => {
 
     const user = jwt.verify(req.headers.token, secretOrPrivateKey);
 
-    UserHistory.find(
-        { user_id: user.userIdx },
-    ).then((history) => {
-        var programs = [];
-
-        history[0]["program"].forEach(function (item) {
-            programs.push((item.program_id));
-        });
-        console.log(programs);
+    UserHistory.find({
+        user_id: user.userIdx
+    }, ).then((history) => {
 
         var programHistory = [];
 
-        for(var i =0; i<programs.length; i++){
-            Program.find({
-                _id: programs[i]
-            }).then((result) => {
-                programHistory.push(result[0]);
-                console.log(programHistory);
-                if(programHistory.length == programs.length)
-                    res.status(200).send(util.successHistory(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
-            }).catch((err) => {
-                console.log(err);
+        if (history[0] == null) {
+            res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
+        } else {
+
+            var programs = [];
+
+            history[0]["program"].forEach(function (item) {
+                programs.push((item.program_id));
             });
+
+            for (var i = 0; i < programs.length; i++) {
+                Program.find({
+                    _id: programs[i]
+                }).then((result) => {
+                    programHistory.push(result[0]);
+                    console.log(programHistory);
+                    if (programHistory.length == programs.length)
+                        res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }
         }
-    
+
 
     }).catch((err) => {
         console.log(err);
@@ -54,8 +59,8 @@ router.get('/', async (req, res) => {
 router.get('/detail/:programId', async (req, res) => {
 
     Program.find({
-        _id: req.params.programId
-    })
+            _id: req.params.programId
+        })
         .then((program) => {
             res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, program));
         }).catch((err) => {
@@ -67,21 +72,23 @@ router.get('/detail/:programId', async (req, res) => {
 router.get('/berry', async (req, res) => {
     const user = jwt.verify(req.headers.token, secretOrPrivateKey);
 
-    UserHistory.find(
-        { user_id: user.userIdx },
-    ).then((history) => {
+    UserHistory.find({
+        user_id: user.userIdx
+    }, ).then((history) => {
         var donateBerry = [];
-        
-        history[0]["program"].forEach(function (item) {
-            var donateJson = new Object();
-            donateJson.berry = (item.donateBerry);
-            donateJson.id = (item.program_id);
-            console.log(donateJson);
-            donateBerry.push(donateJson);
-            console.log(donateBerry);
-        });
-
-        res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, donateBerry));
+        if (history[0] == null) {
+            res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, donateBerry));
+        } else {
+            history[0]["program"].forEach(function (item) {
+                var donateJson = new Object();
+                donateJson.berry = (item.donateBerry);
+                donateJson.id = (item.program_id);
+                console.log(donateJson);
+                donateBerry.push(donateJson);
+                console.log(donateBerry);
+            });
+            res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, donateBerry));
+        }
     }).catch((err) => {
         console.log(err);
         res.status(200).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));

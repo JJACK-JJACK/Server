@@ -31,51 +31,67 @@ router.get('/', (req, res) => {
         .then((history) => {
             var bank = [];
 
-            history[0]["charge"].forEach(function (item) {
-                item.chargeBerry = "-".concat(item.chargeBerry);
-                item.berry = item.chargeBerry;
-                delete item.chargeBerry;
-                bank.push(item);
-            });
+            if (history[0] == null) {
+                res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, {
+                    "user_id": user.userIdx,
+                    "history": bank
+                }));
+            } else {
 
-            UserHistory.find({
-                    user_id: user.userIdx
-                })
-                .then(async (history) => {
-                    var programs = [];
-                    history[0]["program"].forEach(function (item) {
-                        Program.find({
-                                _id: item.program_id
-                            })
-                            .then((program) => {
-                                var centerName = program[0].centerName;
-                                delete item.program_id;
-                                item.donateBerry = "+".concat(item.donateBerry);
-                                item.centerName = centerName;
-                                item.berry = item.donateBerry;
-                                delete item.donateBerry;
-                                bank.push(item);
-                                programs.push(item);
-
-                                if (programs.length == history[0]["program"].length) {
-                                    bank.sort(custom_sort);
-                                    res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, {"user_id": user.userIdx,"history": bank }));
-                                }
-
-                            }).catch((err) => {
-                                console.log(err);
-                                res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
-                            });
-                    });
-                }).catch((err) => {
-                    console.log(err);
-                    res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+                history[0]["charge"].forEach(function (item) {
+                    item.chargeBerry = "+".concat(item.chargeBerry);
+                    item.berry = item.chargeBerry;
+                    delete item.chargeBerry;
+                    bank.push(item);
                 });
+
+                UserHistory.find({
+                        user_id: user.userIdx
+                    })
+                    .then(async (history) => {
+                        var programs = [];
+                        if (history[0] == null) {
+                            res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, {
+                                "user_id": user.userIdx,
+                                "history": bank
+                            }));
+                        } else {
+                            history[0]["program"].forEach(function (item) {
+                                Program.find({
+                                        _id: item.program_id
+                                    })
+                                    .then((program) => {
+                                        var centerName = program[0].centerName;
+                                        delete item.program_id;
+                                        item.donateBerry = "-".concat(item.donateBerry);
+                                        item.centerName = centerName;
+                                        item.berry = item.donateBerry;
+                                        delete item.donateBerry;
+                                        bank.push(item);
+                                        programs.push(item);
+
+                                        if (programs.length == history[0]["program"].length) {
+                                            bank.sort(custom_sort);
+                                            res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, {
+                                                "user_id": user.userIdx,
+                                                "history": bank
+                                            }));
+                                        }
+                                    }).catch((err) => {
+                                        console.log(err);
+                                        res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+                                    });
+                            });
+                        }
+                    }).catch((err) => {
+                        console.log(err);
+                        res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+                    });
+            }
         }).catch((err) => {
             console.log(err);
             res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
         });
-
 });
 
 module.exports = router;

@@ -59,7 +59,7 @@ router.get('/myBerry', async (req, res) => {
     const SelectResult = await pool.queryParam_Parse(SelectBerryQuery, [user.userIdx]);
 
     if (SelectResult[0] == null) {
-        res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+        res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL, 0 ));
     } else {
         res.status(statusCode.OK).send(util.successTrue(statusCode.CREATED, resMessage.READ_SUCCESS, SelectResult[0].myBerry));
     }
