@@ -12,8 +12,7 @@ const UserHistory = require('../../models/userHistorySchema');
 const Stamp = require('../../models/stampSchema');
 const BerryHistory = require('../../models/berryHistorySchema');
 
-const jwt = require('jsonwebtoken');
-const secretKey = "jwtSecretKey!";
+const jwt = require('../../module/jwt');
 
 var moment = require('moment');
 require('moment-timezone');
@@ -21,7 +20,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 router.post('/:programId', (req, res) => {
 
-    const user = jwt.verify(req.headers.token, secretKey);
+    const user = jwt.verify(req.headers.token);
 
     var rewardBerry = 0;
     var stamps = 0;

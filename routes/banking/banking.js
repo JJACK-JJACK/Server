@@ -10,8 +10,7 @@ const BerryHistory = require('../../models/berryHistorySchema');
 const UserHistory = require('../../models/userHistorySchema');
 const Program = require('../../models/programSchema');
 
-const jwt = require('jsonwebtoken');
-const secretKey = "jwtSecretKey!";
+const jwt = require('../../module/jwt');
 
 var moment = require('moment');
 require('moment-timezone');
@@ -23,7 +22,7 @@ function custom_sort(a, b) {
 
 router.get('/', (req, res) => {
 
-    const user = jwt.verify(req.headers.token, secretKey);
+    const user = jwt.verify(req.headers.token);
 
     BerryHistory.find({
             user_id: user.userIdx

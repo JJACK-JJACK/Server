@@ -7,23 +7,13 @@ const resMessage = require('../../module/utils/responseMessage');
 
 const crypto = require('crypto-promise');
 const pool = require('../../module/pool');
-const jwt = require('jsonwebtoken');
+const jwt = require('../../module/jwt');
 
-const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 됨, 깃헙 공유 드라이브 올리지 말기
-
-const secretKey = "jwtSecretKey!";
-
-const options = {
-    algorithm: "HS256",
-    expiresIn: "14d",
-    issuer: "minjony"
-};
 
 router.post('/', async (req, res) => {
     const selectIdQuery = 'SELECT * FROM User WHERE email = ?';
     const selectResult = await pool.queryParam_Parse(selectIdQuery, [req.body.email]);
     const pwd = req.body.password;
-    const userIdx = selectResult[0].userIdx;
 
     if (req.body.id === null || !req.body.password) {
         res.status(statusCode.OK).send(util.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
@@ -34,16 +24,10 @@ router.post('/', async (req, res) => {
             const hashedPw = await crypto.pbkdf2(pwd.toString(), selectResult[0].salt, 1000, 32, 'SHA512');
 
             if (selectResult[0].password == hashedPw.toString('base64')) {
-
-                const payload = {
-                    userIdx: selectResult[0].userIdx,
-                    email: selectResult[0].email,
-                    nickname: selectResult[0].nickname
-                };
                 
-                const token = jwt.sign(payload, secretKey, options);
+                const token = jwt.sign(selectResult[0]);
 
-                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, {"token": token, "nickname": payload.nickname, "email": payload.email }));
+                res.status(200).send(util.successTrue(statusCode.OK, resMessage.LOGIN_SUCCESS, {"token": token.token, "nickname": selectResult[0].nickname, "email": selectResult[0].email ,"profileImg": selectResult[0].profileImg}));
             } else {
                 res.status(200).send(util.successFalse(statusCode.NOT_FOUND, resMessage.MISS_MATCH_PW));
             }

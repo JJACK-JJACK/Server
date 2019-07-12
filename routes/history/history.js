@@ -5,23 +5,22 @@ const util = require('../../module/utils/utils');
 const statusCode = require('../../module/utils/statusCode');
 const resMessage = require('../../module/utils/responseMessage');
 
-const jwtUtils = require('../../module/jwt');
-const authUtil = require('../../module/utils/authUtils');
-
-const pool = require('../../module/pool');
 const Program = require('../../models/programSchema');
 const UserHistory = require('../../models/userHistorySchema');
 
-const jwt = require('jsonwebtoken');
-const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 됨, 깃헙 공유 드라이브 올리지 말기
+const jwt = require('../../module/jwt');
+
+function custom_sort(a, b) {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+}
 
 router.get('/', async (req, res) => {
 
-    const user = jwt.verify(req.headers.token, secretOrPrivateKey);
+    const user = jwt.verify(req.headers.token);
 
     UserHistory.find({
         user_id: user.userIdx
-    }, ).then((history) => {
+    }).then((history) => {
 
         var programHistory = [];
 
@@ -40,16 +39,15 @@ router.get('/', async (req, res) => {
                     _id: programs[i]
                 }).then((result) => {
                     programHistory.push(result[0]);
-                    console.log(programHistory);
-                    if (programHistory.length == programs.length)
+                    if (programHistory.length == programs.length) {
+                        programHistory.sort(custom_sort);
                         res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
+                    }
                 }).catch((err) => {
                     console.log(err);
                 });
             }
         }
-
-
     }).catch((err) => {
         console.log(err);
         res.status(200).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
@@ -70,7 +68,7 @@ router.get('/detail/:programId', async (req, res) => {
 });
 
 router.get('/berry', async (req, res) => {
-    const user = jwt.verify(req.headers.token, secretOrPrivateKey);
+    const user = jwt.verify(req.headers.token);
 
     UserHistory.find({
         user_id: user.userIdx

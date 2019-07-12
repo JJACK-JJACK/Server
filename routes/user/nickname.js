@@ -5,7 +5,6 @@ const util = require('../../module/utils/utils');
 const statusCode = require('../../module/utils/statusCode');
 const resMessage = require('../../module/utils/responseMessage');
 
-const jwtUtils = require('../../module/jwt');
 const pool = require('../../module/pool');
 
 router.post('/', async (req, res) => {

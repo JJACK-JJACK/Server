@@ -7,14 +7,11 @@ const resMessage = require('../../module/utils/responseMessage');
 
 const UserHistory = require('../../models/userHistorySchema');
 
-const pool = require('../../module/pool');
-
-const jwt = require('jsonwebtoken');
-const secretOrPrivateKey = "jwtSecretKey!"; //임의 설정, 다르게 해도 됨, 깃헙 공유 드라이브 올리지 말기
+const jwt = require('../../module/jwt');
 
 router.get('/', async (req, res) => {
 
-    const user = jwt.verify(req.headers.token, secretOrPrivateKey);
+    const user = jwt.verify(req.headers.token);
     var resData = {};
 
     UserHistory.find({

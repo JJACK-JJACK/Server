@@ -9,8 +9,7 @@ const BerryHistory = require('../../models/berryHistorySchema');
 
 const pool = require('../../module/pool');
 
-const jwt = require('jsonwebtoken');
-const secretKey = "jwtSecretKey!";
+const jwt = require('../../module/jwt');
 
 var moment = require('moment');
 require('moment-timezone');
@@ -18,7 +17,7 @@ moment.tz.setDefault("Asia/Seoul");
 
 router.post('/', (req, res) => {
 
-    const user = jwt.verify(req.headers.token, secretKey);
+    const user = jwt.verify(req.headers.token);
 
     if (user === null || !req.body.chargeBerry) {
         res.status(statusCode.OK).send(util.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
@@ -53,7 +52,7 @@ router.post('/', (req, res) => {
 
 router.get('/myBerry', async (req, res) => {
 
-    const user = jwt.verify(req.headers.token, secretKey);
+    const user = jwt.verify(req.headers.token);
 
     const SelectBerryQuery = 'SELECT myBerry FROM User WHERE userIdx = ?';
     const SelectResult = await pool.queryParam_Parse(SelectBerryQuery, [user.userIdx]);
