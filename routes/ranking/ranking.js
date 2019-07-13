@@ -10,7 +10,7 @@ const UserHistory = require('../../models/userHistorySchema');
 
 router.get('/',async (req, res) => {
     Program.find({
-            state: 2
+            state: 2, review: { $ne: [] }
         }).sort({
             start: -1
         }).limit(10)
