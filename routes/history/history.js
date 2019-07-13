@@ -28,25 +28,25 @@ router.get('/', async (req, res) => {
             res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
         } else {
 
-            var programs = [];
-
             history[0]["program"].forEach(function (item) {
-                programs.push((item.program_id));
-            });
-
-            for (var i = 0; i < programs.length; i++) {
-                Program.find({
-                    _id: programs[i]
+                Program.findOne({
+                    _id: item.program_id
                 }).then((result) => {
-                    programHistory.push(result[0]);
-                    if (programHistory.length == programs.length) {
+                    programHistory.push({"result": result, "date": item.date});
+                    if (programHistory.length == history[0]["program"].length) {
                         programHistory.sort(custom_sort);
-                        res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, programHistory));
+                        var donates = [];
+                        programHistory.forEach(function (item) {
+                            console.log(item.result._id);
+                            donates.push(item.result);
+                        delete item.date;
+                        });
+                        res.status(200).send(util.successTrue(statusCode.OK, resMessage.READ_SUCCESS, donates));
                     }
                 }).catch((err) => {
                     console.log(err);
                 });
-            }
+            });
         }
     }).catch((err) => {
         console.log(err);

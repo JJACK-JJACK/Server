@@ -78,7 +78,7 @@ router.get('/', (req, res) => {
                                         }
                                     }).catch((err) => {
                                         console.log(err);
-                                        res.status(statusCode.OK).send(utils.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
+                                        res.status(statusCode.OK).send(util.successFalse(statusCode.DB_ERROR, resMessage.READ_FAIL));
                                     });
                             });
                         }

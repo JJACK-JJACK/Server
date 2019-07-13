@@ -68,6 +68,9 @@ router.post('/:programId', (req, res) => {
                                     var random = Math.floor(Math.random() * 10) + 1;
                                     var reward = Math.floor((result.totalBerry) * (random / 100));
 
+                                    const UpdateBerryQuery = 'UPDATE User SET myBerry = myBerry + ? WHERE userIdx = ?';
+                                    await pool.queryParam_Parse(UpdateBerryQuery, [reward, user.userIdx]);
+
                                     BerryHistory.findOneAndUpdate({
                                             user_id: user.userIdx
                                         }, {
